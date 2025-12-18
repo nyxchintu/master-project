@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Welcome | Master Project</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;900&family=Poppins:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #000000;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        /* Galaxy nebula background */
+        /* Enhanced cursor trail effect */
+        .cursor-trail {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            will-change: transform, opacity;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            z-index: 10000;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
+            animation: nebulaPulse 20s ease-in-out infinite alternate;
+            z-index: 0;
+            pointer-events: none;
+            backdrop-filter: blur(30px);
+        }
+
+        @media (max-width: 640px) {
+            body::before {
+                backdrop-filter: blur(15px);
+            }
+        }
+
+        /* Password decode progress */
+        .decode-progress {
+            position: absolute;
+            top: -24px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: #a78bfa;
+            font-size: 0.875rem;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .decode-progress.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .decode-text {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+        }
+
+        @keyframes glitch {
+            0% {
+                clip-path: inset(50% 0 30% 0);
+                transform: translate(-5px, 0);
+            }
+            20% {
+                clip-path: inset(20% 0 60% 0);
+                transform: translate(5px, 0);
+            }
+            40% {
+                clip-path: inset(40% 0 40% 0);
+                transform: translate(-5px, 0);
+            }
+            60% {
+                clip-path: inset(60% 0 20% 0);
+                transform: translate(5px, 0);
+            }
+            80% {
+                clip-path: inset(30% 0 50% 0);
+                transform: translate(-5px, 0);
+            }
+            100% {
+                clip-path: inset(50% 0 30% 0);
+                transform: translate(0);
+            }
+        }
+
+        .decode-text::before,
+        .decode-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(139, 92, 246, 0.1);
+            opacity: 0;
+        }
+
+        .decode-text.decoding::before {
+            animation: glitch 1s infinite linear alternate-reverse;
+            color: #ec4899;
+            opacity: 0.5;
+        }
+
+        .decode-text.decoding::after {
+            animation: glitch 0.7s infinite linear alternate-reverse;
+            color: #8b5cf6;
+            opacity: 0.5;
+        }
+
+        @keyframes nebulaPulse {
+            0% {
+                opacity: 0.6;
+                filter: blur(60px);
+            }
+            100% {
+                opacity: 0.8;
+                filter: blur(80px);
+            }
+        }
+
+        /* Simple starfield */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 4s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { 
+                opacity: 0.4; 
+            }
+            50% { 
+                opacity: 1; 
+            }
+        }
+
+        /* Simple container animation */
+        #container {
+            animation: fadeInUp 0.8s ease-out forwards;
+            transform-origin: center center;
+            margin: 0 auto;
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Clean glassmorphism card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: softBreathing 4s ease-in-out infinite;
+        }
+
+        /* Soft breathing glow animation */
+        @keyframes softBreathing {
+            0%, 100% {
+                box-shadow: 
+                    0 20px 60px rgba(0, 0, 0, 0.5),
+                    0 0 40px rgba(139, 92, 246, 0.15),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+            50% {
+                box-shadow: 
+                    0 20px 60px rgba(0, 0, 0, 0.5),
+                    0 0 60px rgba(139, 92, 246, 0.25),
+                    0 0 80px rgba(236, 72, 153, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        /* Clean button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, 
+                #8b5cf6 0%, 
+                #a78bfa 100%);
+            box-shadow: 
+                0 8px 25px rgba(139, 92, 246, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255,255,255,0.4), 
+                transparent);
+            transition: left 0.6s;
+        }
+
+        .btn-primary::after {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            padding: 2px;
+            background: linear-gradient(135deg, 
+                rgba(255,255,255,0.5), 
+                rgba(255,255,255,0.1));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, 
+                          linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, 
+                 linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover::after {
+            opacity: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 12px 35px rgba(139, 92, 246, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, 
+                #f59e0b 0%, 
+                #fbbf24 100%);
+            box-shadow: 
+                0 8px 25px rgba(245, 158, 11, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-secondary::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255,255,255,0.4), 
+                transparent);
+            transition: left 0.6s;
+        }
+
+        .btn-secondary:hover::before {
+            left: 100%;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 12px 35px rgba(245, 158, 11, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:active {
+            transform: translateY(0);
+        }
+
+        /* Simple input styling */
+        .input-field {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: rgba(139, 92, 246, 0.6);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 0 20px rgba(139, 92, 246, 0.4),
+                inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Simple text animations */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            0% { 
+                opacity: 0; 
+                transform: translateY(20px);
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Subtle title glow - reduced for readability */
+        .majestic-title {
+            text-shadow: 
+                0 0 12px rgba(139, 92, 246, 0.3),
+                0 0 24px rgba(236, 72, 153, 0.15);
+            animation: titleGlow 4s ease-in-out infinite alternate,
+                       heartbeatPulse 2s ease-in-out infinite;
+            position: relative;
+        }
+
+        @keyframes titleGlow {
+            0% {
+                text-shadow: 
+                    0 0 12px rgba(139, 92, 246, 0.3),
+                    0 0 24px rgba(236, 72, 153, 0.15);
+            }
+            100% {
+                text-shadow: 
+                    0 0 18px rgba(139, 92, 246, 0.4),
+                    0 0 36px rgba(236, 72, 153, 0.2);
+            }
+        }
+
+        /* Soft heartbeat pulse animation */
+        @keyframes heartbeatPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            15% {
+                transform: scale(1.02);
+            }
+            30% {
+                transform: scale(1);
+            }
+            45% {
+                transform: scale(1.02);
+            }
+            60% {
+                transform: scale(1);
+            }
+        }
+
+        /* Floating particles/constellation around text */
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatParticle 8s ease-in-out infinite;
+        }
+
+        @keyframes floatParticle {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.4;
+            }
+            33% {
+                transform: translate(8px, -12px) scale(1.1);
+                opacity: 0.7;
+            }
+            66% {
+                transform: translate(-6px, -18px) scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        /* Audio element styling */
+        #bgMusic {
+            display: none;
+        }
+
+        /* Return to disclaimer link styling */
+        .return-link {
+            color: rgba(139, 92, 246, 0.6);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            font-weight: 400;
+        }
+
+        .return-link:hover {
+            color: rgba(139, 92, 246, 0.9);
+            text-decoration: underline;
+        }
+
+        /* Error shake animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-12px) rotate(-2deg); }
+            75% { transform: translateX(12px) rotate(2deg); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        /* Simple hint box */
+        .hint-box {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 8px 32px rgba(139, 92, 246, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+
+        .hint-box:hover {
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 
+                0 12px 40px rgba(139, 92, 246, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        /* Typing animation styles */
+        .typing-text {
+            overflow: hidden;
+            white-space: normal;
+            word-wrap: break-word;
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+        }
+
+        .typing-text::after {
+            content: '';
+            display: inline-block;
+            width: 2px;
+            height: 1em;
+            background: rgba(139, 92, 246, 0.5);
+            margin-left: 2px;
+            animation: blinkCursor 0.8s step-end infinite;
+            vertical-align: text-bottom;
+        }
+
+        .typing-text.typing-complete::after {
+            display: none;
+        }
+
+        @keyframes blinkCursor {
+            0%, 50% {
+                opacity: 1;
+            }
+            51%, 100% {
+                opacity: 0;
+            }
+        }
+
+        /* Simple divider */
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(139, 92, 246, 0.5), 
+                rgba(236, 72, 153, 0.5), 
+                transparent);
+            animation: dividerPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes dividerPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Simple transitions */
+        #disclaimer, #password-box {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        #password-box.hidden {
+            display: none;
+        }
+
+        /* Perfect alignment for content */
+        #disclaimer, #password-box {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        /* Responsive adjustments - Perfect symmetry maintained */
+        @media (max-width: 768px) {
+            #container {
+                padding: 2rem 1.5rem;
+                max-width: calc(100% - 2rem);
+                margin: 1rem;
+            }
+            
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .hint-box {
+                max-width: 100%;
+                font-size: 0.95rem;
+                padding: 1.5rem;
+            }
+
+            .typing-text {
+                font-size: 0.95rem;
+                line-height: 1.5;
+            }
+
+            .input-field {
+                font-size: 1rem;
+                padding: 0.875rem 1rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            #container {
+                padding: 1.5rem 1rem;
+            }
+            
+            .majestic-title {
+                font-size: 2.25rem !important;
+                line-height: 1.2;
+            }
+
+            .hint-box {
+                padding: 1.25rem;
+                margin: 0 0.5rem;
+            }
+        }
+
+        /* Ensure perfect centering at all times */
+        @media (min-width: 1024px) {
+            #container {
+                max-width: 40rem;
+            }
+        }
+    </style>
+    <script src="assets/confetti.js"></script>
+</head>
+<body class="relative text-white">
+    <!-- Background Music -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="assets/bg.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Starfield -->
+    <div id="starfield"></div>
+
+    <!-- Main Card Container - Perfectly Centered -->
+    <div id="container" class="relative z-10 w-full p-12 glass-card rounded-3xl space-y-10 text-center mx-auto" style="max-width: 40rem;">
+
+        <!-- Disclaimer Screen -->
+        <div id="disclaimer" class="space-y-8 fade-in w-full">
+            <div class="space-y-5">
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-purple-300 via-pink-300 via-yellow-300 to-purple-300 bg-clip-text text-transparent font-['Cinzel'] tracking-wide majestic-title relative">
+                    Disclaimer
+                </h1>
+                <div class="divider w-32 mx-auto"></div>
+            </div>
+            <p class="text-gray-100 text-lg md:text-xl leading-relaxed px-2 md:px-6 font-['Cormorant_Garamond'] italic max-w-lg mx-auto">
+                This site is a countdown project forever made with deep love and care.
+                It holds emotional value and is meant for one special person only.
+                Please proceed only if you understand and accept this. Also just so you know,
+                this is my last gift to you, I wont run behind you now, from now on, its your turn to find me if you wish to.
+            </p>
+            <div class="pt-2">
+                <button
+                  onclick="showPasswordBox()"
+                  class="btn-primary font-semibold text-white py-4 px-12 rounded-full text-xl relative z-10 mx-auto"
+                >
+                  <span class="relative z-10">I Understand</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Password Box Screen -->
+        <div id="password-box" class="space-y-8 hidden w-full">
+            <div class="space-y-5 slide-in relative">
+                <h2 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-yellow-300 via-amber-300 via-yellow-400 to-amber-300 bg-clip-text text-transparent font-['Cinzel'] tracking-wide majestic-title relative">
+                    Enter Access Password
+                </h2>
+                <div class="divider w-40 mx-auto"></div>
+                <!-- Return to disclaimer link -->
+                <div class="pt-2">
+                    <a href="#" onclick="returnToDisclaimer(); return false;" class="return-link inline-block">
+                        ← Return to Disclaimer
+                    </a>
+                </div>
+            </div>
+
+            <!-- Password Input Section -->
+            <div class="space-y-6 w-full max-w-md mx-auto relative">
+                <div class="decode-progress">
+                    <span class="decode-text" data-text="DECODING...">DECODING: 0%</span>
+                </div>
+                <input
+                  type="password"
+                  id="password"
+                  placeholder="Enter password..."
+                  class="input-field w-full px-6 py-4 rounded-2xl text-white placeholder-gray-400 text-lg font-medium"
+                  onkeypress="if(event.key === 'Enter') checkPassword()"
+                />
+                <p id="error" class="text-red-300 hidden text-base font-semibold flex items-center justify-center gap-3">
+                    <span class="text-2xl">⚠️</span>
+                    <span>Wrong password. Try Again.</span>
+                </p>
+            </div>
+
+            <!-- Enter Button -->
+            <div class="w-full max-w-md mx-auto pt-2">
+                <button
+                  onclick="checkPassword()"
+                  class="btn-secondary text-white font-semibold py-4 px-12 rounded-full text-xl w-full relative z-10"
+                >
+                  <span class="relative z-10">Enter</span>
+                </button>
+            </div>
+
+            <!-- Show Hint Toggle Button -->
+            <div class="pt-2">
+                <button
+                  id="toggleHintBtn"
+                  onclick="toggleHint()"
+                  class="text-purple-300 hover:text-purple-200 underline text-base block mx-auto focus:outline-none transition-all duration-300 hover:scale-105 font-medium"
+                >
+                  Show Hint 🔍
+                </button>
+            </div>
+
+            <!-- Hidden Hint Box -->
+            <div id="password-hint" class="hidden mt-6 rounded-2xl hint-box p-8 text-gray-100 text-base select-text space-y-4 slide-in w-full max-w-2xl mx-auto">
+                <p class="typing-text font-semibold text-purple-300 mb-3 text-lg font-['Cormorant_Garamond'] text-center" data-text="Only someone meant to enter..."></p>
+                <p class="typing-text italic font-['Cormorant_Garamond'] text-lg text-center" data-text="Knows it doesn't begin with a name made for the internet -"></p>
+                <p class="typing-text italic font-['Cormorant_Garamond'] text-lg text-center" data-text="Not the name the world scrolls by..."></p>
+                <div class="pt-4 space-y-3 text-left px-2">
+                    <p class="typing-text font-['Cormorant_Garamond'] text-lg" data-text="1. But the one softly spoken in real life, with love - starting with a capital <strong class='text-purple-300 font-bold'>S</strong>."></p>
+                    <p class="typing-text font-['Cormorant_Garamond'] text-lg" data-text="2. Then the name known only by those who held you close - written twice, no space, both starting with a capital <strong class='text-purple-300 font-bold'>B</strong>."></p>
+                    <p class="typing-text font-['Cormorant_Garamond'] text-lg" data-text="3. Lastly, six digits that mark your moment - <strong class='text-purple-300 font-bold'>MonthDayYear, MMDDYY.</strong>"></p>
+                </div>
+                <p class="typing-text pt-4 font-semibold text-purple-300 text-lg font-['Cormorant_Garamond'] text-center" data-text="No breaks. No noise. No special characters. Only someone who knows the &quot;<strong>real you</strong>&quot; will ever pass."></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced cursor trail effect
+        let trails = [];
+        const maxTrails = 12; // Increased number of trails
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+        let lastTrailTime = 0;
+        
+        function lerp(start, end, factor) {
+            return start + (end - start) * factor;
+        }
+        
+        document.addEventListener('mousemove', (e) => {
+            const now = Date.now();
+            const timeDiff = now - lastTrailTime;
+            
+            // Only create new trail if enough time has passed or mouse moved significantly
+            if (timeDiff > 16 || Math.hypot(e.clientX - lastMouseX, e.clientY - lastMouseY) > 5) {
+                const trail = document.createElement('div');
+                trail.className = 'cursor-trail';
+                
+                // Interpolate position for smoother movement
+                const x = lerp(lastMouseX || e.clientX, e.clientX, 0.8);
+                const y = lerp(lastMouseY || e.clientY, e.clientY, 0.8);
+                
+                trail.style.left = x + 'px';
+                trail.style.top = y + 'px';
+                document.body.appendChild(trail);
+                
+                trails.push({
+                    element: trail,
+                    timestamp: now,
+                    x: x,
+                    y: y
+                });
+                
+                if (trails.length > maxTrails) {
+                    const oldestTrail = trails.shift();
+                    oldestTrail.element.remove();
+                }
+                
+                lastMouseX = x;
+                lastMouseY = y;
+                lastTrailTime = now;
+            }
+            
+            requestAnimationFrame(() => {
+                trails.forEach((trail, i) => {
+                    const age = Date.now() - trail.timestamp;
+                    const opacity = Math.max(0, 1 - age / 400); // Faster fade
+                    const scale = Math.max(0.2, 1 - age / 800);
+                    
+                    trail.element.style.opacity = opacity;
+                    trail.element.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                    trail.element.style.boxShadow = `0 0 ${15 * scale}px rgba(255, 255, 255, ${opacity * 0.3})`;
+                    
+                    if (opacity <= 0) {
+                        trail.element.remove();
+                        trails.splice(i, 1);
+                    }
+                });
+            });
+        });
+
+        // Enhanced password input with decode simulation
+        const passwordInput = document.getElementById('password');
+        const correctPassword = "SafaBilBil012908";
+        let decodeProgress = null;
+
+        function updateDecodeProgress() {
+            if (!decodeProgress) {
+                decodeProgress = passwordInput.parentElement.querySelector('.decode-progress');
+            }
+
+            const input = passwordInput.value;
+            const progress = Math.min(100, Math.floor((input.length / correctPassword.length) * 100));
+            
+            // Show progress bar when typing starts
+            if (input.length > 0) {
+                decodeProgress.classList.add('visible');
+                const decodeText = decodeProgress.querySelector('.decode-text');
+                decodeText.classList.add('decoding');
+                
+                // Calculate how many characters match with the correct password
+                const matchCount = [...input].reduce((acc, char, i) => 
+                    acc + (correctPassword[i] === char ? 1 : 0), 0);
+                const matchPercentage = Math.floor((matchCount / correctPassword.length) * 100);
+                
+                // Add some randomness to make it look like decoding
+                const randomOffset = Math.floor(Math.random() * 5);
+                const displayedProgress = Math.min(100, matchPercentage + randomOffset);
+                
+                decodeText.textContent = `DECODING: ${displayedProgress}%`;
+                decodeText.setAttribute('data-text', `DECODING: ${displayedProgress}%`);
+                
+                // Add extra effects when getting closer
+                if (matchPercentage > 70) {
+                    decodeText.style.textShadow = '0 0 15px rgba(139, 92, 246, 0.8)';
+                } else {
+                    decodeText.style.textShadow = '';
+                }
+            } else {
+                decodeProgress.classList.remove('visible');
+            }
+        }
+
+        passwordInput.addEventListener('input', updateDecodeProgress);
+        passwordInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        // Auto-focus password input when password screen appears
+        // Create simple starfield
+        function createStarfield() {
+            const starfield = document.getElementById("starfield");
+            const starCount = 60; // Reduced for better performance
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement("div");
+                star.className = "star";
+                
+                const size = Math.random() * 1.5 + 0.5;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const delay = Math.random() * 4;
+                
+                star.style.width = size + "px";
+                star.style.height = size + "px";
+                star.style.left = x + "%";
+                star.style.top = y + "%";
+                star.style.animationDelay = delay + "s";
+                star.style.opacity = Math.random() * 0.4 + 0.4;
+                
+                starfield.appendChild(star);
+            }
+        }
+
+        // Create floating particles around text
+        function createParticles() {
+            const titles = document.querySelectorAll('.majestic-title');
+            titles.forEach(title => {
+                // Create 8-12 particles around each title
+                const particleCount = Math.floor(Math.random() * 5) + 8;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    // Position particles randomly around the text
+                    const angle = (Math.PI * 2 * i) / particleCount;
+                    const radius = 60 + Math.random() * 40;
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    
+                    particle.style.position = 'absolute';
+                    particle.style.left = '50%';
+                    particle.style.top = '50%';
+                    particle.style.transform = `translate(${x}px, ${y}px)`;
+                    particle.style.animationDelay = (Math.random() * 2) + 's';
+                    particle.style.animationDuration = (6 + Math.random() * 4) + 's';
+                    
+                    title.appendChild(particle);
+                }
+            });
+        }
+
+        // Initialize on load
+        window.addEventListener("DOMContentLoaded", () => {
+            createStarfield();
+            // Delay particle creation slightly to ensure titles are rendered
+            setTimeout(createParticles, 100);
+        });
+
+        function showPasswordBox() {
+            const disclaimer = document.getElementById("disclaimer");
+            const passwordBox = document.getElementById("password-box");
+            
+            // Start background music with low volume
+            const bgMusic = document.getElementById("bgMusic");
+            if (bgMusic) {
+                bgMusic.volume = 0.35;
+                bgMusic.play().catch(console.log);
+            }
+            
+            disclaimer.style.transition = "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)";
+            disclaimer.style.opacity = "0";
+            disclaimer.style.transform = "translateY(-25px) scale(0.96)";
+            disclaimer.style.filter = "blur(8px)";
+            
+            setTimeout(() => {
+                disclaimer.classList.add("hidden");
+                passwordBox.classList.remove("hidden");
+                passwordBox.style.opacity = "0";
+                passwordBox.style.transform = "translateY(25px) scale(0.96)";
+                passwordBox.style.filter = "blur(8px)";
+                
+                requestAnimationFrame(() => {
+                    passwordBox.style.transition = "all 0.9s cubic-bezier(0.16, 1, 0.3, 1)";
+                    passwordBox.classList.add("fade-in");
+                    passwordBox.style.opacity = "1";
+                    passwordBox.style.transform = "translateY(0) scale(1)";
+                    passwordBox.style.filter = "blur(0)";
+                    
+                    // Focus on password input
+                    setTimeout(() => {
+                        const input = document.getElementById("password");
+                        input.focus();
+                    }, 400);
+                });
+            }, 600);
+        }
+
+        function returnToDisclaimer() {
+            const disclaimer = document.getElementById("disclaimer");
+            const passwordBox = document.getElementById("password-box");
+            
+            // Smooth fade out password box
+            passwordBox.style.transition = "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)";
+            passwordBox.style.opacity = "0";
+            passwordBox.style.transform = "translateY(25px) scale(0.96)";
+            passwordBox.style.filter = "blur(8px)";
+            
+            setTimeout(() => {
+                passwordBox.classList.add("hidden");
+                disclaimer.classList.remove("hidden");
+                disclaimer.style.opacity = "0";
+                disclaimer.style.transform = "translateY(-25px) scale(0.96)";
+                disclaimer.style.filter = "blur(8px)";
+                
+                // Use requestAnimationFrame for smooth transition
+                requestAnimationFrame(() => {
+                    disclaimer.style.transition = "all 0.9s cubic-bezier(0.16, 1, 0.3, 1)";
+                    disclaimer.classList.add("fade-in");
+                    disclaimer.style.opacity = "1";
+                    disclaimer.style.transform = "translateY(0) scale(1)";
+                    disclaimer.style.filter = "blur(0)";
+                });
+            }, 600);
+        }
+
+        // Typing animation function
+        function typeText(element, text, speed = 30) {
+            return new Promise((resolve) => {
+                element.innerHTML = '';
+                element.classList.remove('typing-complete');
+                let index = 0;
+                
+                function type() {
+                    if (index < text.length) {
+                        // Check if we're entering HTML tags
+                        if (text[index] === '<') {
+                            // Find the closing tag
+                            const tagEnd = text.indexOf('>', index);
+                            if (tagEnd !== -1) {
+                                // Insert the whole tag at once
+                                const tag = text.substring(index, tagEnd + 1);
+                                element.innerHTML += tag;
+                                index = tagEnd + 1;
+                            } else {
+                                element.innerHTML += text[index];
+                                index++;
+                            }
+                        } else {
+                            element.innerHTML += text[index];
+                            index++;
+                        }
+                        setTimeout(type, speed);
+                    } else {
+                        element.classList.add('typing-complete');
+                        resolve();
+                    }
+                }
+                
+                type();
+            });
+        }
+
+        function toggleHint() {
+            const hint = document.getElementById("password-hint");
+            const btn = document.getElementById("toggleHintBtn");
+            
+            if(hint.classList.contains("hidden")) {
+                // Check if hint was already fully typed
+                const typingElements = hint.querySelectorAll('.typing-text');
+                const allTyped = Array.from(typingElements).every(el => el.classList.contains('typing-complete'));
+                
+                hint.classList.remove("hidden");
+                
+                if (allTyped) {
+                    // Already typed - show instantly without animation
+                    hint.style.opacity = "1";
+                    hint.style.transform = "translateY(0) scale(1)";
+                    hint.style.transition = "all 0.3s ease";
+                } else {
+                    // Not typed yet - show with animation
+                    hint.style.opacity = "0";
+                    hint.style.transform = "translateY(-15px) scale(0.98)";
+                    hint.style.transition = "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)";
+                    
+                    requestAnimationFrame(() => {
+                        hint.classList.add("slide-in");
+                        hint.style.opacity = "1";
+                        hint.style.transform = "translateY(0) scale(1)";
+                    });
+                    
+                    // Start typing animation sequentially - wait for each line to finish
+                    setTimeout(async () => {
+                        for (let i = 0; i < typingElements.length; i++) {
+                            const element = typingElements[i];
+                            const text = element.getAttribute('data-text');
+                            if (text && !element.classList.contains('typing-complete')) {
+                                await typeText(element, text, i < 3 ? 25 : 20);
+                                // Small pause between lines
+                                await new Promise(resolve => setTimeout(resolve, 150));
+                            }
+                        }
+                    }, 200);
+                }
+                
+                btn.innerHTML = "Hide Hint 🔒";
+                btn.style.transform = "scale(0.95)";
+                setTimeout(() => {
+                    btn.style.transform = "scale(1)";
+                }, 150);
+            } else {
+                hint.style.transition = "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+                hint.style.opacity = "0";
+                hint.style.transform = "translateY(-10px) scale(0.98)";
+                setTimeout(() => {
+                    hint.classList.add("hidden");
+                    hint.classList.remove("slide-in");
+                    // Don't reset typing elements - keep them typed
+                }, 400);
+                btn.innerHTML = "Show Hint 🔍";
+                btn.style.transform = "scale(0.95)";
+                setTimeout(() => {
+                    btn.style.transform = "scale(1)";
+                }, 150);
+            }
+        }
+
+        function checkPassword() {
+            const input = document.getElementById("password");
+            const error = document.getElementById("error");
+            const container = document.getElementById("container");
+            const normalPassword = "SafaBilBil012908";
+            const adminPassword = "SafawedsSohail";
+
+            if (input.value === normalPassword) {
+                // existing countdown flow (keep original animation)
+                const canvas = document.createElement('canvas');
+                canvas.style.position = 'fixed';
+                canvas.style.top = '0';
+                canvas.style.left = '0';
+                canvas.style.width = '100%';
+                canvas.style.height = '100%';
+                canvas.style.zIndex = '1000';
+                document.body.appendChild(canvas);
+
+                container.style.transition = "all 0.7s cubic-bezier(0.16, 1, 0.3, 1)";
+                container.style.transform = "scale(0.93)";
+                container.style.opacity = "0";
+                container.style.filter = "blur(20px)";
+                const nebula = new NebulaAnimation(canvas, 'Safa');
+                nebula.start();
+                setTimeout(() => {
+                    canvas.style.transition = 'all 1s ease';
+                    canvas.style.opacity = '0';
+                    setTimeout(() => {
+                        window.location.href = "countdown.html";
+                    }, 1000);
+                }, 4000);
+                return;
+            }
+
+            if (input.value === adminPassword) {
+                // Open admin portal modal (no redirect)
+                openAdminPortal();
+                return;
+            }
+
+            // Wrong password feedback
+            error.classList.remove("hidden");
+            error.style.opacity = "0";
+            error.style.transform = "scale(0.9) translateY(-5px)";
+            error.style.transition = "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)";
+            requestAnimationFrame(() => {
+                error.style.opacity = "1";
+                error.style.transform = "scale(1) translateY(0)";
+            });
+            input.style.transition = "all 0.3s ease";
+            input.classList.add("shake");
+            input.value = "";
+            input.style.boxShadow = "0 0 30px rgba(239, 68, 68, 0.7), 0 0 0 4px rgba(239, 68, 68, 0.2)";
+            setTimeout(() => {
+                input.classList.remove("shake");
+                input.style.boxShadow = "";
+                input.style.transition = "all 0.5s cubic-bezier(0.23, 1, 0.32, 1)";
+            }, 500);
+            setTimeout(() => { input.focus(); }, 650);
+        }
+
+        // --- Admin portal: create a modal to add messages for each section ---
+        function openAdminPortal() {
+            // build modal only once
+            if (document.getElementById('admin-portal-root')) {
+                document.getElementById('admin-portal-root').style.display = 'flex';
+                return;
+            }
+
+            const root = document.createElement('div');
+            root.id = 'admin-portal-root';
+            root.style.position = 'fixed';
+            root.style.inset = '0';
+            root.style.display = 'flex';
+            root.style.alignItems = 'center';
+            root.style.justifyContent = 'center';
+            root.style.background = 'rgba(0,0,0,0.6)';
+            root.style.zIndex = '9999';
+
+            const card = document.createElement('div');
+            card.style.width = 'min(1000px, 96%)';
+            card.style.maxHeight = '90%';
+            card.style.overflow = 'auto';
+            card.style.padding = '1rem';
+            card.style.borderRadius = '12px';
+            card.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02))';
+            card.style.border = '1px solid rgba(255,255,255,0.06)';
+            card.style.color = '#fff';
+
+            // Header
+            const header = document.createElement('div');
+            header.style.display = 'flex';
+            header.style.justifyContent = 'space-between';
+            header.style.alignItems = 'center';
+            header.style.marginBottom = '0.5rem';
+
+            const title = document.createElement('h2');
+            title.textContent = 'Admin Portal — Add Messages';
+            title.style.margin = '0';
+            title.style.fontSize = '1.1rem';
+            title.style.fontWeight = '700';
+
+            const closeX = document.createElement('button');
+            closeX.textContent = '✕';
+            closeX.title = 'Close';
+            closeX.style.background = 'transparent';
+            closeX.style.border = 'none';
+            closeX.style.color = '#fff';
+            closeX.style.fontSize = '1.25rem';
+            closeX.style.cursor = 'pointer';
+            closeX.onclick = () => { root.style.display = 'none'; };
+
+            header.appendChild(title);
+            header.appendChild(closeX);
+            card.appendChild(header);
+
+            const info = document.createElement('p');
+            info.innerHTML = 'Enter the message for each section. Messages will be shown for 48 hours after the countdown for that section ends.';
+            info.style.marginBottom = '0.75rem';
+            card.appendChild(info);
+
+            const sections = [
+                { key: 'ist', label: 'India (IST)' },
+                { key: 'qatar', label: 'Qatar (midnight)' },
+                { key: 'qatar-birth', label: 'Qatar (birth time)' }
+            ];
+
+            // layout columns: left inputs, right preview & controls
+            const cols = document.createElement('div');
+            cols.style.display = 'grid';
+            cols.style.gridTemplateColumns = '1fr 360px';
+            cols.style.gap = '1rem';
+
+            const left = document.createElement('div');
+            const right = document.createElement('div');
+            right.style.position = 'relative';
+
+            // Keep section controls map
+            const controls = {};
+
+            sections.forEach(s => {
+                const wrapper = document.createElement('div');
+                wrapper.style.marginBottom = '0.75rem';
+
+                const label = document.createElement('label');
+                label.style.display = 'block';
+                label.style.fontWeight = '700';
+                label.textContent = s.label;
+
+                const ta = document.createElement('textarea');
+                ta.id = 'message_' + s.key;
+                ta.rows = 6;
+                ta.style.width = '100%';
+                ta.style.marginTop = '0.5rem';
+                ta.className = 'input-field';
+                ta.placeholder = 'Enter message to display when countdown ends (supports basic HTML).';
+                const existing = localStorage.getItem('message_' + s.key);
+                if (existing) ta.value = existing;
+
+                wrapper.appendChild(label);
+                wrapper.appendChild(ta);
+                left.appendChild(wrapper);
+
+                // right side: preview box + simulate
+                const ctrl = document.createElement('div');
+                ctrl.style.border = '1px solid rgba(255,255,255,0.04)';
+                ctrl.style.borderRadius = '10px';
+                ctrl.style.padding = '0.75rem';
+                ctrl.style.marginBottom = '0.75rem';
+
+                const head = document.createElement('div');
+                head.style.display = 'flex';
+                head.style.justifyContent = 'space-between';
+                head.style.alignItems = 'center';
+                head.style.marginBottom = '0.5rem';
+
+                const hLabel = document.createElement('div');
+                hLabel.textContent = s.label;
+                hLabel.style.fontWeight = '700';
+                hLabel.style.fontSize = '0.95rem';
+
+                const simBtn = document.createElement('button');
+                simBtn.textContent = 'Simulate Hit';
+                simBtn.className = 'btn-secondary';
+                simBtn.style.fontSize = '0.8rem';
+                simBtn.onclick = () => {
+                    const key = (s.key === 'qatar-birth') ? 'lastHit_qatar_birth' : (s.key === 'qatar' ? 'lastHit_qatar' : 'lastHit_ist');
+                    localStorage.setItem(key, String(Date.now()));
+                    alert('Simulated hit for ' + s.label + '. The message will now be available for 48 hours.');
+                    // update last hit display
+                    if (controls[s.key] && controls[s.key].lastEl) controls[s.key].lastEl.textContent = new Date().toString();
+                };
+
+                const clearBtn = document.createElement('button');
+                clearBtn.textContent = 'Clear Hit';
+                clearBtn.className = 'btn-primary';
+                clearBtn.style.fontSize = '0.8rem';
+                clearBtn.style.marginLeft = '0.5rem';
+                clearBtn.onclick = () => {
+                    const key = (s.key === 'qatar-birth') ? 'lastHit_qatar_birth' : (s.key === 'qatar' ? 'lastHit_qatar' : 'lastHit_ist');
+                    localStorage.removeItem(key);
+                    alert('Cleared hit for ' + s.label + '.');
+                    if (controls[s.key] && controls[s.key].lastEl) controls[s.key].lastEl.textContent = 'No hit recorded';
+                };
+
+                head.appendChild(hLabel);
+                const rightControls = document.createElement('div');
+                rightControls.style.display = 'flex';
+                rightControls.style.gap = '0.5rem';
+                rightControls.appendChild(simBtn);
+                rightControls.appendChild(clearBtn);
+                head.appendChild(rightControls);
+
+                const preview = document.createElement('div');
+                preview.style.minHeight = '60px';
+                preview.style.background = 'rgba(0,0,0,0.25)';
+                preview.style.borderRadius = '8px';
+                preview.style.padding = '0.5rem';
+                preview.style.fontSize = '0.95rem';
+                preview.style.color = '#fff';
+                preview.innerHTML = existing || '<span class="muted">(no message)</span>';
+
+                const lastRow = document.createElement('div');
+                lastRow.style.marginTop = '0.5rem';
+                lastRow.style.fontSize = '0.85rem';
+                lastRow.style.color = '#cfcfcf';
+                const lastKey = (s.key === 'qatar-birth') ? 'lastHit_qatar_birth' : (s.key === 'qatar' ? 'lastHit_qatar' : 'lastHit_ist');
+                const lastVal = localStorage.getItem(lastKey);
+                const lastEl = document.createElement('div');
+                lastEl.textContent = lastVal ? new Date(Number(lastVal)).toString() : 'No hit recorded';
+
+                lastRow.appendChild(lastEl);
+
+                ctrl.appendChild(head);
+                ctrl.appendChild(preview);
+                ctrl.appendChild(lastRow);
+
+                right.appendChild(ctrl);
+
+                // store controls for updates
+                controls[s.key] = { textarea: ta, preview, lastEl };
+
+                // live update preview
+                ta.addEventListener('input', () => {
+                    preview.innerHTML = ta.value || '<span class="muted">(no message)</span>';
+                });
+            });
+
+            cols.appendChild(left);
+            cols.appendChild(right);
+            card.appendChild(cols);
+
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.gap = '0.5rem';
+            actions.style.justifyContent = 'flex-end';
+            actions.style.marginTop = '1rem';
+
+            const saveBtn = document.createElement('button');
+            saveBtn.className = 'btn-primary';
+            saveBtn.textContent = 'Save Messages';
+            saveBtn.onclick = () => {
+                sections.forEach(s => {
+                    const v = document.getElementById('message_' + s.key).value;
+                    if (v && v.trim().length) {
+                        localStorage.setItem('message_' + s.key, v);
+                    } else {
+                        localStorage.removeItem('message_' + s.key);
+                    }
+                    // update preview boxes
+                    if (controls[s.key] && controls[s.key].preview) controls[s.key].preview.innerHTML = v || '<span class="muted">(no message)</span>';
+                });
+                alert('Messages saved locally. They will be shown for 48 hours after each countdown ends.');
+            };
+
+            const previewAllBtn = document.createElement('button');
+            previewAllBtn.className = 'btn-primary';
+            previewAllBtn.textContent = 'Preview All';
+            previewAllBtn.onclick = () => {
+                // open message.html for first section in a new tab to preview
+                window.open('message.html?section=' + sections[0].key, '_blank');
+            };
+
+            const simAllBtn = document.createElement('button');
+            simAllBtn.className = 'btn-secondary';
+            simAllBtn.textContent = 'Simulate All Hits';
+            simAllBtn.onclick = () => {
+                sections.forEach(s => {
+                    const key = (s.key === 'qatar-birth') ? 'lastHit_qatar_birth' : (s.key === 'qatar' ? 'lastHit_qatar' : 'lastHit_ist');
+                    localStorage.setItem(key, String(Date.now()));
+                    if (controls[s.key] && controls[s.key].lastEl) controls[s.key].lastEl.textContent = new Date().toString();
+                });
+                alert('Simulated hits for all sections. Messages (if set) will now be available for 48 hours.');
+            };
+
+            const clearAllHitsBtn = document.createElement('button');
+            clearAllHitsBtn.className = 'btn-primary';
+            clearAllHitsBtn.textContent = 'Clear All Hits';
+            clearAllHitsBtn.onclick = () => {
+                if (!confirm('Clear all last-hit timestamps? This will remove simulated hits.')) return;
+                sections.forEach(s => {
+                    const key = (s.key === 'qatar-birth') ? 'lastHit_qatar_birth' : (s.key === 'qatar' ? 'lastHit_qatar' : 'lastHit_ist');
+                    localStorage.removeItem(key);
+                    if (controls[s.key] && controls[s.key].lastEl) controls[s.key].lastEl.textContent = 'No hit recorded';
+                });
+                alert('Cleared all hits.');
+            };
+
+            const openCountdown = document.createElement('button');
+            openCountdown.className = 'btn-secondary';
+            openCountdown.textContent = 'Open Countdown';
+            openCountdown.onclick = () => { window.location.href = 'countdown.html'; };
+
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = 'Close';
+            closeBtn.className = 'btn-primary';
+            closeBtn.style.background = 'transparent';
+            closeBtn.style.border = '1px solid rgba(255,255,255,0.08)';
+            closeBtn.onclick = () => { root.style.display = 'none'; };
+
+            actions.appendChild(closeBtn);
+            actions.appendChild(openCountdown);
+            actions.appendChild(simAllBtn);
+            actions.appendChild(clearAllHitsBtn);
+            actions.appendChild(previewAllBtn);
+            actions.appendChild(saveBtn);
+
+            card.appendChild(actions);
+            root.appendChild(card);
+            document.body.appendChild(root);
+        }
+    </script>
+</body>
+</html>
