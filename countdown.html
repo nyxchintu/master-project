@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Countdown | Master Project</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;900&family=Poppins:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: relative;
+            padding: 2rem 1rem;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
+            animation: nebulaPulse 20s ease-in-out infinite alternate;
+            z-index: 0;
+            pointer-events: none;
+            backdrop-filter: blur(30px);
+        }
+
+        @keyframes nebulaPulse {
+            0% {
+                opacity: 0.6;
+                filter: blur(60px);
+            }
+            100% {
+                opacity: 0.8;
+                filter: blur(80px);
+            }
+        }
+
+        .countdown-circle {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            padding: 0.5rem;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .countdown-circle:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        @media (min-width: 640px) {
+            .countdown-circle {
+                width: 140px;
+                height: 140px;
+                padding: 1rem;
+            }
+        }
+        .countdown-circle svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        .countdown-circle circle {
+                fill: none;
+                stroke-width: 8;
+                filter: url(#glow);
+        }
+        .countdown-circle .bg {
+                stroke: rgba(255, 255, 255, 0.25);
+        }
+        .countdown-circle .progress {
+            stroke-linecap: round;
+                transition: stroke-dashoffset 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                filter: drop-shadow(0 0 4px currentColor);
+        }
+        .clock {
+            font-family: monospace;
+            font-size: 1.75em;
+            padding: 0.5em;
+            border-radius: 0.5em;
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 1em;
+            letter-spacing: 2px;
+                font-size: 1.5em;
+                padding: 0.75em;
+                border-radius: 1em;
+                background: rgba(255, 255, 255, 0.15);
+                margin: 1em 0;
+                letter-spacing: 2px;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), inset 0 1px 3px rgba(255, 255, 255, 0.1);
+            }
+            @media (min-width: 640px) {
+                .clock {
+                    font-size: 1.75em;
+                }
+            }
+        .analog-clock {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            position: relative;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .analog-clock:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.4),
+                0 0 60px rgba(139, 92, 246, 0.2),
+                inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .analog-clock::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, transparent 65%, rgba(255, 255, 255, 0.1));
+        }
+        .analog-clock .marker {
+            position: absolute;
+            width: 2px;
+            height: 10px;
+            background: currentColor;
+            left: 50%;
+            transform-origin: 50% 80px; /* Half of clock height */
+            opacity: 0.4;
+        }
+        .analog-clock .marker.hour {
+            height: 15px;
+            width: 3px;
+            opacity: 0.8;
+            transform-origin: 50% 80px;
+        }
+        .analog-clock .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom;
+            background: currentColor;
+            border-radius: 20px;
+            transform-origin: 50% 100%;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+        .analog-clock .hour {
+            width: 4px;
+            height: 30%;
+            margin-left: -2px;
+        }
+        .analog-clock .minute {
+            width: 3px;
+            height: 40%;
+            margin-left: -1.5px;
+        }
+        .analog-clock .second {
+            width: 2px;
+            height: 45%;
+            margin-left: -1px;
+            background: #ff6b6b;
+        }
+        .analog-clock .center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: currentColor;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+        .analog-clock .center-dot::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.2);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .time-section {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            max-width: 1200px;
+            margin: 0 auto 2rem;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: softBreathing 4s ease-in-out infinite;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .time-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 25px 70px rgba(0, 0, 0, 0.6),
+                0 0 40px rgba(139, 92, 246, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes softBreathing {
+            0%, 100% {
+                box-shadow: 
+                    0 20px 60px rgba(0, 0, 0, 0.5),
+                    0 0 40px rgba(139, 92, 246, 0.15),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+            50% {
+                box-shadow: 
+                    0 20px 60px rgba(0, 0, 0, 0.5),
+                    0 0 60px rgba(139, 92, 246, 0.25),
+                    0 0 80px rgba(236, 72, 153, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+        }
+        .time-section h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .countdown-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+        @media (min-width: 1024px) {
+            .countdown-container {
+                flex-direction: row;
+                justify-content: space-between;
+                gap: 4rem;
+            }
+        }
+        .countdown-circles {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            justify-items: center;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+        }
+        @media (min-width: 640px) {
+            .countdown-circles {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        .clock-wrapper {
+            text-align: center;
+            width: 100%;
+            max-width: 200px;
+        }
+        .clock {
+            font-family: monospace;
+            font-size: 1.75rem;
+            padding: 0.75em;
+            border-radius: 1em;
+            background: rgba(255, 255, 255, 0.08);
+            margin: 1.5rem 0;
+            letter-spacing: 3px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .countdown-circle {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 1rem;
+        }
+        /* Using .countdown-number and .countdown-unit now for number and unit display */
+        .countdown-number {
+            font-size: 2rem;
+            text-align: center;
+            line-height: 1;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+        }
+        @media (min-width: 640px) {
+            .countdown-number { font-size: 2.5rem; }
+        }
+        .countdown-unit {
+            text-align: center;
+            font-size: 0.75rem;
+            opacity: 0.85;
+            letter-spacing: 0.08em;
+        }
+        .countdown-circle .absolute { pointer-events: none; }
+    </style>
+</head>
+<body class="relative text-white min-h-screen flex items-center justify-center p-4 md:p-8" style="font-family: 'Poppins', sans-serif;">
+        <!-- SVG Filters -->
+        <svg width="0" height="0" style="position: absolute;">
+            <defs>
+                <filter id="glow">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur" />
+                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="glow" />
+                    <feBlend in="SourceGraphic" in2="glow" mode="normal" />
+                </filter>
+            </defs>
+        </svg>
+
+    <!-- Starfield -->
+    <div id="starfield"></div>
+
+    <div id="main-container" class="relative z-10 space-y-16 text-center max-w-7xl w-full px-4 py-8">
+        <div class="relative mb-12">
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent font-['Cinzel'] tracking-wide majestic-title">
+                Birthday Countdown
+            </h1>
+            <div class="divider w-32 mx-auto mt-4"></div>
+            <p class="text-gray-300 text-lg md:text-xl mt-6 font-['Cormorant_Garamond'] italic max-w-2xl mx-auto">
+                A journey through time zones, counting down to a special moment
+            </p>
+        </div>
+
+        <!--Countdown 1: IST 00:00-->
+        <div class="time-section glass-card">
+            <h2 class="text-2xl text-blue-300 font-['Cinzel'] font-semibold mb-6">India (IST)</h2>
+                <div class="countdown-container">
+                    <div class="clock-wrapper">
+                        <div id="analog-clock-ist" class="analog-clock"></div>
+                        <div id="clock-ist" class="clock text-blue-300 mt-2"></div>
+                    </div>
+                    <div class="countdown-ist-circles countdown-circles"></div>
+                </div>
+        </div>
+
+        <!--Countdown 2: Qatar 00:00-->
+        <div class="time-section">
+            <h2 class="text-2xl text-green-300 font-['Cinzel'] font-semibold mb-6">Qatar (AST) - Midnight</h2>
+            <div class="countdown-container">
+                <div class="clock-wrapper">
+                    <div id="analog-clock-qatar" class="analog-clock"></div>
+                    <div id="clock-qatar" class="clock text-green-300 mt-2"></div>
+                </div>
+                <div class="countdown-qatar-circles countdown-circles"></div>
+            </div>
+        </div>
+
+        <!--Countdown 3: Qatar Birth Time-->
+        <div class="time-section">
+            <h2 class="text-2xl text-yellow-300 font-['Cinzel'] font-semibold mb-6">Qatar (AST) - Birth Time (23:50)</h2>
+            <div class="countdown-container">
+                <div class="clock-wrapper">
+                    <div id="analog-clock-qatar-birth" class="analog-clock"></div>
+                    <div id="clock-qatar-birth" class="clock text-yellow-300 mt-2"></div>
+                </div>
+                <div class="countdown-qatar-birth-circles countdown-circles"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced cursor trail effect
+        let trails = [];
+        const maxTrails = 12;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+        let lastTrailTime = 0;
+        
+        function lerp(start, end, factor) {
+            return start + (end - start) * factor;
+        }
+        
+        document.addEventListener('mousemove', (e) => {
+            const now = Date.now();
+            const timeDiff = now - lastTrailTime;
+            
+            if (timeDiff > 16 || Math.hypot(e.clientX - lastMouseX, e.clientY - lastMouseY) > 5) {
+                const trail = document.createElement('div');
+                trail.className = 'cursor-trail';
+                
+                const x = lerp(lastMouseX || e.clientX, e.clientX, 0.8);
+                const y = lerp(lastMouseY || e.clientY, e.clientY, 0.8);
+                
+                trail.style.left = x + 'px';
+                trail.style.top = y + 'px';
+                document.body.appendChild(trail);
+                
+                trails.push({
+                    element: trail,
+                    timestamp: now,
+                    x: x,
+                    y: y
+                });
+                
+                if (trails.length > maxTrails) {
+                    const oldestTrail = trails.shift();
+                    oldestTrail.element.remove();
+                }
+                
+                lastMouseX = x;
+                lastMouseY = y;
+                lastTrailTime = now;
+            }
+            
+            requestAnimationFrame(() => {
+                trails.forEach((trail, i) => {
+                    const age = Date.now() - trail.timestamp;
+                    const opacity = Math.max(0, 1 - age / 400);
+                    const scale = Math.max(0.2, 1 - age / 800);
+                    
+                    trail.element.style.opacity = opacity;
+                    trail.element.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                    trail.element.style.boxShadow = `0 0 ${15 * scale}px rgba(255, 255, 255, ${opacity * 0.3})`;
+                    
+                    if (opacity <= 0) {
+                        trail.element.remove();
+                        trails.splice(i, 1);
+                    }
+                });
+            });
+        });
+
+        // Create simple starfield
+        function createStarfield() {
+            const starfield = document.getElementById("starfield");
+            const starCount = 60;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement("div");
+                star.className = "star";
+                
+                const size = Math.random() * 1.5 + 0.5;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const delay = Math.random() * 4;
+                
+                star.style.width = size + "px";
+                star.style.height = size + "px";
+                star.style.left = x + "%";
+                star.style.top = y + "%";
+                star.style.animationDelay = delay + "s";
+                star.style.opacity = Math.random() * 0.4 + 0.4;
+                
+                starfield.appendChild(star);
+            }
+        }
+
+        // Initialize starfield
+        window.addEventListener("DOMContentLoaded", () => {
+            createStarfield();
+        });
+
+        // Create circular countdown element
+        function createCountdownCircle(parent, label, color) {
+            // outer container (holds the circular SVG)
+            const container = document.createElement('div');
+            container.className = 'countdown-circle flex flex-col items-center justify-center';
+
+            // svg circle (background + progress)
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 150 150');
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '100%');
+
+            const bg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            bg.setAttribute('cx', '75');
+            bg.setAttribute('cy', '75');
+            bg.setAttribute('r', '60');
+            bg.setAttribute('class', 'bg');
+
+            const progress = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            progress.setAttribute('cx', '75');
+            progress.setAttribute('cy', '75');
+            progress.setAttribute('r', '60');
+            progress.setAttribute('class', 'progress');
+            progress.style.stroke = color;
+
+            // overlay inside circle for the small label (centered)
+            const overlay = document.createElement('div');
+            overlay.className = 'absolute inset-0 flex items-center justify-center pointer-events-none';
+
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'text-sm font-semibold uppercase tracking-wider';
+            labelDiv.textContent = label;
+            labelDiv.style.color = color;
+
+            overlay.appendChild(labelDiv);
+
+            // append svg + overlay to container
+            svg.appendChild(bg);
+            svg.appendChild(progress);
+            container.appendChild(svg);
+            container.appendChild(overlay);
+
+            // big number below the circle
+            const numberEl = document.createElement('div');
+            numberEl.className = 'countdown-number mt-3 font-bold';
+            numberEl.style.color = color;
+            numberEl.textContent = '--';
+
+            // unit / small description below number
+            const unitEl = document.createElement('div');
+            unitEl.className = 'countdown-unit text-xs uppercase opacity-90 mt-1';
+            unitEl.style.color = color;
+            unitEl.textContent = '';
+
+            // item wrapper keeps circle + number + unit together as one grid item
+            const itemWrapper = document.createElement('div');
+            itemWrapper.className = 'countdown-item flex flex-col items-center';
+            itemWrapper.appendChild(container);
+            itemWrapper.appendChild(numberEl);
+            itemWrapper.appendChild(unitEl);
+
+            parent.appendChild(itemWrapper);
+
+            return { numberEl, unitEl, progress };
+        }
+
+        // Setup countdown circles for each section
+        function setupCountdownSection(selector, color) {
+            const container = document.querySelector(selector);
+            return {
+                days: createCountdownCircle(container, 'Days', color),
+                hours: createCountdownCircle(container, 'Hours', color),
+                minutes: createCountdownCircle(container, 'Minutes', color),
+                seconds: createCountdownCircle(container, 'Seconds', color)
+            };
+        }
+
+        // Initialize analog clock with markers
+        function initializeAnalogClock(clockId, color) {
+            const clock = document.getElementById(clockId);
+            
+            // Add hour markers
+            for (let i = 0; i < 12; i++) {
+                const marker = document.createElement('div');
+                marker.className = 'marker hour';
+                marker.style.color = color;
+                marker.style.transform = `rotate(${i * 30}deg) translateX(-50%) translateY(-100%)`;
+                clock.appendChild(marker);
+            }
+            
+            // Add minute markers
+            for (let i = 0; i < 60; i++) {
+                if (i % 5 !== 0) { // Skip positions where hour markers are
+                    const marker = document.createElement('div');
+                    marker.className = 'marker';
+                    marker.style.color = color;
+                    marker.style.transform = `rotate(${i * 6}deg) translateX(-50%) translateY(-100%)`;
+                    clock.appendChild(marker);
+                }
+            }
+            
+            // Add hands
+            const hands = ['hour', 'minute', 'second'];
+            hands.forEach(type => {
+                const hand = document.createElement('div');
+                hand.className = `hand ${type}`;
+                hand.style.color = color;
+                clock.appendChild(hand);
+            });
+            
+            // Add center dot
+            const centerDot = document.createElement('div');
+            centerDot.className = 'center-dot';
+            centerDot.style.backgroundColor = color;
+            clock.appendChild(centerDot);
+        }
+
+        // Update analog clock
+        function updateAnalogClock(clockId, date) {
+            const hours = date.getHours() % 12;
+            const minutes = date.getMinutes();
+            const seconds = date.getSeconds();
+            const milliseconds = date.getMilliseconds();
+            
+            const clock = document.getElementById(clockId);
+            if (!clock) return; // Skip if clock doesn't exist
+            
+            const hourHand = clock.querySelector('.hand.hour');
+            const minuteHand = clock.querySelector('.hand.minute');
+            const secondHand = clock.querySelector('.hand.second');
+            
+            // Calculate precise angles including milliseconds for smooth movement
+            const hourDeg = (hours + minutes / 60) * 30;
+            const minuteDeg = (minutes + seconds / 60) * 6;
+            const secondDeg = (seconds + milliseconds / 1000) * 6;
+            
+            // Apply smooth transforms with proper acceleration
+            if (hourHand) hourHand.style.transform = `rotate(${hourDeg}deg)`;
+            if (minuteHand) minuteHand.style.transform = `rotate(${minuteDeg}deg)`;
+            if (secondHand) secondHand.style.transform = `rotate(${secondDeg}deg)`;
+
+            // Add pulse effect to second hand
+            if (secondHand) secondHand.style.height = `${50 + Math.sin(seconds * Math.PI / 30) * 2}%`;
+        }
+
+        // Initialize all clocks
+        initializeAnalogClock('analog-clock-ist', '#93C5FD'); // blue-300
+        initializeAnalogClock('analog-clock-qatar', '#86EFAC'); // green-300
+        initializeAnalogClock('analog-clock-qatar-birth', '#FDE047'); // yellow-300
+
+        const istCircles = setupCountdownSection('.countdown-ist-circles', '#93C5FD'); // blue-300
+        const qatarCircles = setupCountdownSection('.countdown-qatar-circles', '#86EFAC'); // green-300
+        const qatarBirthCircles = setupCountdownSection('.countdown-qatar-birth-circles', '#FDE047'); // yellow-300
+
+        // Update circle progress
+        function updateCircle(circle, value, maxValue, unitText) {
+            if (!circle || !circle.progress) return;
+
+            const r = 60; // same as SVG r attribute
+            const circumference = 2 * Math.PI * r;
+            const ratio = Math.max(0, Math.min(1, value / maxValue));
+            // progress should represent how much is left: e.g., 0 => full circle, 1 => empty
+            const offset = circumference * (1 - ratio);
+
+            // apply stroke dash
+            circle.progress.style.strokeDasharray = `${circumference}`;
+            circle.progress.style.strokeDashoffset = offset;
+
+            // display number (big, below circle)
+            const displayValue = value < 10 ? `0${value}` : String(value);
+            if (circle.numberEl) circle.numberEl.textContent = displayValue;
+
+            // unit text below number (e.g., "HOURS LEFT")
+            if (circle.unitEl && unitText) circle.unitEl.textContent = unitText;
+
+            // color animation based on remaining ratio (green -> red)
+            const hue = Math.round(120 * ratio); // 0 = red, 120 = green
+            circle.progress.style.stroke = `hsl(${hue}, 90%, 60%)`;
+        }
+
+        // Format time for clock display
+        function formatTime(date) {
+            return date.toLocaleTimeString('en-US', { 
+                hour12: true,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
+        // Get remaining time components (do NOT auto-roll target here)
+        function getTimeComponents(targetDate, now) {
+            let diff = targetDate - now;
+            const positive = Math.max(0, diff);
+
+            const days = Math.floor(positive / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((positive % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((positive % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((positive % (1000 * 60)) / 1000);
+
+            return {
+                days,
+                hours,
+                minutes,
+                seconds,
+                total: diff
+            };
+        }
+
+        // Create a small button for a section (visible by default). We'll handle click UI in JS.
+        function createRedirectButton(circleSelector, id, color, href, key) {
+            const container = document.querySelector(circleSelector);
+            const section = container ? container.closest('.time-section') : null;
+            if (!section) return null;
+
+            const btn = document.createElement('button');
+            btn.id = id;
+            btn.dataset.href = href || '';
+            btn.dataset.section = key || '';
+            btn.textContent = 'View Message';
+            btn.type = 'button';
+            btn.className = 'mt-4 inline-block px-4 py-2 rounded-full font-semibold transition-transform transform hover:scale-105';
+            btn.style.background = color;
+            btn.style.color = '#000';
+            btn.style.border = 'none';
+            btn.style.cursor = 'pointer';
+            // always show button from now on
+            btn.style.display = 'inline-block';
+
+            // click handler
+            btn.addEventListener('click', (e) => {
+                const sec = btn.dataset.section;
+                handleSectionButtonClick(sec);
+            });
+
+            // append after the countdown-container
+            section.appendChild(btn);
+            return btn;
+        }
+
+        // --- Modal / alert UI (simple, pretty) ---
+        // Create modal container once
+        const modalRoot = document.createElement('div');
+        modalRoot.id = 'ai-modal-root';
+        modalRoot.style.position = 'fixed';
+        modalRoot.style.top = '0';
+        modalRoot.style.left = '0';
+        modalRoot.style.width = '100%';
+        modalRoot.style.height = '100%';
+        modalRoot.style.display = 'none';
+        modalRoot.style.alignItems = 'center';
+        modalRoot.style.justifyContent = 'center';
+        modalRoot.style.zIndex = '9999';
+        modalRoot.style.backdropFilter = 'blur(6px)';
+
+        const modalOverlay = document.createElement('div');
+        modalOverlay.style.position = 'absolute';
+        modalOverlay.style.top = '0';
+        modalOverlay.style.left = '0';
+        modalOverlay.style.width = '100%';
+        modalOverlay.style.height = '100%';
+        modalOverlay.style.background = 'linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.6))';
+
+        const modalCard = document.createElement('div');
+        modalCard.style.position = 'relative';
+        modalCard.style.minWidth = '320px';
+        modalCard.style.maxWidth = '720px';
+        modalCard.style.padding = '1.5rem';
+        modalCard.style.borderRadius = '12px';
+        modalCard.style.boxShadow = '0 10px 40px rgba(0,0,0,0.6)';
+        modalCard.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02))';
+        modalCard.style.color = '#fff';
+        modalCard.style.display = 'flex';
+        modalCard.style.flexDirection = 'column';
+        modalCard.style.gap = '0.75rem';
+        modalCard.style.border = '1px solid rgba(255,255,255,0.06)';
+
+        const modalTitle = document.createElement('h3');
+        modalTitle.style.margin = '0';
+        modalTitle.style.fontSize = '1.25rem';
+        modalTitle.style.fontWeight = '700';
+        modalTitle.style.letterSpacing = '0.4px';
+
+        const modalMessage = document.createElement('div');
+        modalMessage.style.fontSize = '1rem';
+        modalMessage.style.lineHeight = '1.4';
+
+        const modalActions = document.createElement('div');
+        modalActions.style.display = 'flex';
+        modalActions.style.gap = '0.5rem';
+        modalActions.style.justifyContent = 'flex-end';
+
+        modalCard.appendChild(modalTitle);
+        modalCard.appendChild(modalMessage);
+        modalCard.appendChild(modalActions);
+
+        modalRoot.appendChild(modalOverlay);
+        modalRoot.appendChild(modalCard);
+        document.body.appendChild(modalRoot);
+
+        function showModal(title, message, actions = []) {
+            modalTitle.textContent = title || '';
+            modalMessage.innerHTML = message || '';
+            // clear previous actions
+            modalActions.innerHTML = '';
+            actions.forEach(act => {
+                const b = document.createElement('button');
+                b.textContent = act.label;
+                b.className = 'px-4 py-2 rounded-md font-semibold';
+                b.style.border = 'none';
+                b.style.cursor = 'pointer';
+                if (act.primary) {
+                    b.style.background = act.color || '#8B5CF6';
+                    b.style.color = '#000';
+                } else {
+                    b.style.background = 'transparent';
+                    b.style.color = '#fff';
+                    b.style.border = '1px solid rgba(255,255,255,0.08)';
+                }
+                b.addEventListener('click', () => {
+                    if (act.onClick) act.onClick();
+                    hideModal();
+                });
+                modalActions.appendChild(b);
+            });
+
+            modalRoot.style.display = 'flex';
+            // small entrance animation
+            modalCard.style.transform = 'translateY(8px) scale(0.98)';
+            modalCard.style.opacity = '0';
+            requestAnimationFrame(() => {
+                modalCard.style.transition = 'transform 220ms cubic-bezier(.2,.8,.2,1), opacity 220ms ease';
+                modalCard.style.transform = 'translateY(0) scale(1)';
+                modalCard.style.opacity = '1';
+            });
+        }
+
+        function hideModal() {
+            modalRoot.style.display = 'none';
+        }
+
+        // Helper: format remaining duration nicely
+        function humanDuration(ms) {
+            const s = Math.floor(ms / 1000);
+            const h = Math.floor(s / 3600);
+            const m = Math.floor((s % 3600) / 60);
+            const ss = s % 60;
+            const parts = [];
+            if (h) parts.push(h + 'h');
+            if (m) parts.push(m + 'm');
+            if (ss || parts.length === 0) parts.push(ss + 's');
+            return parts.join(' ');
+        }
+
+        // --- Tick sound (WebAudio) ---
+        let audioCtx = null;
+        let masterGain = null;
+        let noiseBuffer = null;
+        let tickToggle = false; // alternate tick/tock for realism
+
+        function initAudio() {
+            if (audioCtx) return;
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                masterGain = audioCtx.createGain();
+                masterGain.gain.value = 0.12; // comfortable low volume
+                masterGain.connect(audioCtx.destination);
+
+                // create a short noise buffer to reuse for clicks
+                const sampleRate = audioCtx.sampleRate;
+                const len = Math.floor(sampleRate * 0.08); // 80ms
+                noiseBuffer = audioCtx.createBuffer(1, len, sampleRate);
+                const data = noiseBuffer.getChannelData(0);
+                for (let i = 0; i < len; i++) {
+                    // generate decaying noise envelope for a percussive click
+                    const env = Math.exp(-i / (sampleRate * 0.02));
+                    data[i] = (Math.random() * 2 - 1) * env * 0.8;
+                }
+            } catch (e) {
+                audioCtx = null;
+            }
+        }
+
+        // Ensure we initialize audio on first user gesture to satisfy autoplay policies
+        function initAudioOnGesture() {
+            initAudio();
+            try { document.removeEventListener('pointerdown', initAudioOnGesture); } catch (e) {}
+        }
+        document.addEventListener('pointerdown', initAudioOnGesture);
+
+        // Play a short percussive tick
+        function playTick() {
+            if (!audioCtx) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+            const now = audioCtx.currentTime;
+
+            // alternate tick/tock to mimic mechanical clocks
+            tickToggle = !tickToggle;
+            const highFreq = tickToggle ? 1700 : 1300; // click brightness
+            const bodyFreq = tickToggle ? 130 : 90; // low thud freq
+            const bodyAmp = tickToggle ? 0.45 : 0.35;
+
+            // noise click using reusable buffer
+            if (noiseBuffer) {
+                const noiseSrc = audioCtx.createBufferSource();
+                noiseSrc.buffer = noiseBuffer;
+                const noiseFilter = audioCtx.createBiquadFilter();
+                noiseFilter.type = 'highpass';
+                noiseFilter.frequency.value = highFreq;
+
+                const ng = audioCtx.createGain();
+                ng.gain.setValueAtTime(0.0001, now);
+                ng.gain.exponentialRampToValueAtTime(1.0, now + 0.004);
+                ng.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+                noiseSrc.connect(noiseFilter);
+                noiseFilter.connect(ng);
+                ng.connect(masterGain);
+
+                noiseSrc.start(now);
+                noiseSrc.stop(now + 0.07);
+            }
+
+            // low body oscillator for resonance
+            const body = audioCtx.createOscillator();
+            body.type = 'sine';
+            body.frequency.value = bodyFreq;
+            const bg = audioCtx.createGain();
+            bg.gain.setValueAtTime(0.0001, now);
+            bg.gain.exponentialRampToValueAtTime(bodyAmp, now + 0.006);
+            bg.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+            body.connect(bg);
+            bg.connect(masterGain);
+            body.start(now);
+            body.stop(now + 0.12);
+        }
+
+        // Initialize persistent targets and buttons for each section so we can detect the moment they hit
+        const nowForInitIST = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+        let istTarget = new Date(nowForInitIST.getFullYear(), 0, 29, 0, 0, 0, 0);
+        if (istTarget - nowForInitIST <= 0) istTarget.setFullYear(istTarget.getFullYear() + 1);
+
+        const nowForInitQatar = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Qatar"}));
+        let qatarTarget = new Date(nowForInitQatar.getFullYear(), 0, 29, 0, 0, 0, 0);
+        if (qatarTarget - nowForInitQatar <= 0) qatarTarget.setFullYear(qatarTarget.getFullYear() + 1);
+
+        let qatarBirthTarget = new Date(nowForInitQatar.getFullYear(), 0, 29, 23, 50, 0, 0);
+        if (qatarBirthTarget - nowForInitQatar <= 0) qatarBirthTarget.setFullYear(qatarBirthTarget.getFullYear() + 1);
+
+        // Buttons that will show when the respective section reaches its target
+        const istButton = createRedirectButton('.countdown-ist-circles', 'btn-ist', '#93C5FD', 'message.html?section=ist', 'ist');
+        const qatarButton = createRedirectButton('.countdown-qatar-circles', 'btn-qatar', '#86EFAC', 'message.html?section=qatar', 'qatar');
+        const qatarBirthButton = createRedirectButton('.countdown-qatar-birth-circles', 'btn-qatar-birth', '#FDE047', 'message.html?section=qatar-birth', 'qatar-birth');
+
+        // Section states with persistence for last-hit timestamps
+        const HOURS48 = 48 * 60 * 60 * 1000;
+        const sections = {
+            'ist': {
+                key: 'ist',
+                target: istTarget,
+                button: istButton,
+                storageKey: 'lastHit_ist',
+                lastHit: null // Will be loaded from Firebase
+            },
+            'qatar': {
+                key: 'qatar',
+                target: qatarTarget,
+                button: qatarButton,
+                storageKey: 'lastHit_qatar',
+                lastHit: null // Will be loaded from Firebase
+            },
+            'qatar-birth': {
+                key: 'qatar-birth',
+                target: qatarBirthTarget,
+                button: qatarBirthButton,
+                storageKey: 'lastHit_qatar_birth',
+                lastHit: null // Will be loaded from Firebase
+            }
+        };
+
+        // Load last hits from Firebase (async)
+        async function loadLastHitsFromFirebase() {
+            try {
+                sections['ist'].lastHit = await getLastHit('ist');
+                sections['qatar'].lastHit = await getLastHit('qatar');
+                sections['qatar-birth'].lastHit = await getLastHit('qatar-birth');
+            } catch (error) {
+                console.error('Error loading hits from Firebase:', error);
+                // Fallback to localStorage
+                sections['ist'].lastHit = loadLastHit('lastHit_ist');
+                sections['qatar'].lastHit = loadLastHit('lastHit_qatar');
+                sections['qatar-birth'].lastHit = loadLastHit('lastHit_qatar_birth');
+            }
+        }
+
+        function loadLastHit(key) {
+            try {
+                const v = localStorage.getItem(key);
+                if (!v) return null;
+                const t = parseInt(v, 10);
+                if (Number.isNaN(t)) return null;
+                return t;
+            } catch (e) { return null; }
+        }
+
+        async function saveLastHitToFirebase(sectionKey, ts) {
+            try {
+                await saveLastHit(sectionKey, ts);
+            } catch (error) {
+                console.error('Error saving hit to Firebase:', error);
+                // Fallback to localStorage
+                const key = sectionKey === 'qatar-birth' ? 'lastHit_qatar_birth' : 
+                            (sectionKey === 'qatar' ? 'lastHit_qatar' : 'lastHit_ist');
+                try { localStorage.setItem(key, String(ts)); } catch (e) { /* ignore */ }
+            }
+        }
+
+        function clearLastHit(key) {
+            try { localStorage.removeItem(key); } catch (e) { /* ignore */ }
+        }
+        
+        // Initialize Firebase data on page load
+        loadLastHitsFromFirebase();
+
+        function isAvailable(section) {
+            const st = sections[section];
+            if (!st || !st.lastHit) return false;
+            const now = Date.now();
+            return (now - st.lastHit) < HOURS48;
+        }
+
+        // When a section button is clicked
+        function handleSectionButtonClick(sectionKey) {
+            const st = sections[sectionKey];
+            if (!st) return;
+
+            const now = Date.now();
+            // If currently in availability window
+            if (isAvailable(sectionKey)) {
+                const expiresIn = (st.lastHit + HOURS48) - now;
+                showModal(
+                    'Message available',
+                    `<strong>Your message is available for the next ${humanDuration(expiresIn)}.</strong><br/>Would you like to open it now?`,
+                    [
+                        { label: 'Cancel', primary: false },
+                        { label: 'Proceed', primary: true, color: '#FDE047', onClick() {
+                            // Redirect to stored href (if any). We'll preserve link pattern used earlier.
+                            const href = (st.button && st.button.dataset && st.button.dataset.href) ? st.button.dataset.href : '';
+                            if (href) window.location.href = href; else console.log('No href configured for section', sectionKey);
+                        } }
+                    ]
+                );
+                return;
+            }
+
+            // otherwise, not yet available
+            showModal(
+                'Please wait',
+                `<strong>Patience is a virtue.</strong><br/>This message will be available when the countdown for this section reaches its target. Keep watching — it will only take a moment.`,
+                [ { label: 'Close', primary: false } ]
+            );
+        }
+
+        // Main update function
+        function updateAll() {
+            // Update IST
+            const nowIST = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+            document.getElementById("clock-ist").textContent = formatTime(nowIST);
+            updateAnalogClock("analog-clock-ist", nowIST);
+
+            // IST: if target reached, record hit (once), show availability modal and roll target to next year
+            const stIst = sections['ist'];
+            if (nowIST >= stIst.target) {
+                // if we haven't recorded this hit yet (or recorded for an earlier year), record it now
+                if (!stIst.lastHit || stIst.lastHit < stIst.target.getTime()) {
+                    stIst.lastHit = Date.now();
+                    saveLastHitToFirebase(stIst.key, stIst.lastHit);
+                    // notify user immediately
+                    showModal('Message available', `<strong>The message for India (IST) is now available for 48 hours.</strong><br/>You can open it now.`, [
+                        { label: 'Close', primary: false },
+                        { label: 'Proceed', primary: true, color: '#93C5FD', onClick() { const href = stIst.button?.dataset.href || ''; if (href) window.location.href = href; } }
+                    ]);
+                }
+                if (stIst.button) stIst.button.style.display = 'inline-block';
+                // roll the target to the next year so the countdown continues
+                stIst.target.setFullYear(stIst.target.getFullYear() + 1);
+            }
+
+            const istComponents = getTimeComponents(stIst.target, nowIST);
+            updateCircle(istCircles.days, istComponents.days, 365, 'DAYS LEFT');
+            updateCircle(istCircles.hours, istComponents.hours, 24, 'HOURS LEFT');
+            updateCircle(istCircles.minutes, istComponents.minutes, 60, 'MINUTES LEFT');
+            updateCircle(istCircles.seconds, istComponents.seconds, 60, 'SECONDS LEFT');
+
+            // Update Qatar (midnight)
+            const nowQatar = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Qatar"}));
+            document.getElementById("clock-qatar").textContent = formatTime(nowQatar);
+            updateAnalogClock("analog-clock-qatar", nowQatar);
+
+            // Qatar midnight: same handling
+            const stQatar = sections['qatar'];
+            if (nowQatar >= stQatar.target) {
+                if (!stQatar.lastHit || stQatar.lastHit < stQatar.target.getTime()) {
+                    stQatar.lastHit = Date.now();
+                    saveLastHitToFirebase(stQatar.key, stQatar.lastHit);
+                    showModal('Message available', `<strong>The message for Qatar (midnight) is now available for 48 hours.</strong><br/>You can open it now.`, [
+                        { label: 'Close', primary: false },
+                        { label: 'Proceed', primary: true, color: '#86EFAC', onClick() { const href = stQatar.button?.dataset.href || ''; if (href) window.location.href = href; } }
+                    ]);
+                }
+                if (stQatar.button) stQatar.button.style.display = 'inline-block';
+                stQatar.target.setFullYear(stQatar.target.getFullYear() + 1);
+            }
+
+            const qatarComponents = getTimeComponents(stQatar.target, nowQatar);
+            updateCircle(qatarCircles.days, qatarComponents.days, 365, 'DAYS LEFT');
+            updateCircle(qatarCircles.hours, qatarComponents.hours, 24, 'HOURS LEFT');
+            updateCircle(qatarCircles.minutes, qatarComponents.minutes, 60, 'MINUTES LEFT');
+            updateCircle(qatarCircles.seconds, qatarComponents.seconds, 60, 'SECONDS LEFT');
+
+            // Update Qatar Birth Time
+            updateAnalogClock("analog-clock-qatar-birth", nowQatar);
+            const qatarBirthClockEl = document.getElementById('clock-qatar-birth');
+            if (qatarBirthClockEl) qatarBirthClockEl.textContent = formatTime(nowQatar);
+
+            // Qatar birth time handling
+            const stQatarBirth = sections['qatar-birth'];
+            if (nowQatar >= stQatarBirth.target) {
+                if (!stQatarBirth.lastHit || stQatarBirth.lastHit < stQatarBirth.target.getTime()) {
+                    stQatarBirth.lastHit = Date.now();
+                    saveLastHitToFirebase(stQatarBirth.key, stQatarBirth.lastHit);
+                    showModal('Message available', `<strong>The message for Qatar (birth time) is now available for 48 hours.</strong><br/>You can open it now.`, [
+                        { label: 'Close', primary: false },
+                        { label: 'Proceed', primary: true, color: '#FDE047', onClick() { const href = stQatarBirth.button?.dataset.href || ''; if (href) window.location.href = href; } }
+                    ]);
+                }
+                if (stQatarBirth.button) stQatarBirth.button.style.display = 'inline-block';
+                stQatarBirth.target.setFullYear(stQatarBirth.target.getFullYear() + 1);
+            }
+
+            const qatarBirthComponents = getTimeComponents(stQatarBirth.target, nowQatar);
+            updateCircle(qatarBirthCircles.days, qatarBirthComponents.days, 365, 'DAYS LEFT');
+            updateCircle(qatarBirthCircles.hours, qatarBirthComponents.hours, 24, 'HOURS LEFT');
+            updateCircle(qatarBirthCircles.minutes, qatarBirthComponents.minutes, 60, 'MINUTES LEFT');
+            updateCircle(qatarBirthCircles.seconds, qatarBirthComponents.seconds, 60, 'SECONDS LEFT');
+
+            // play ticking sound each update (synchronized with the visual update)
+            try { playTick(); } catch (e) { /* ignore audio errors */ }
+        }
+
+        // Update every second
+        setInterval(updateAll, 1000);
+        updateAll();
+    </script>
+</body>
+</html>
